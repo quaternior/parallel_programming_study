@@ -297,13 +297,11 @@ void convolution1D_tiled(float* d_N, float* d_P, int Kernel_Width, int Width)
         int halo_index_left = (blockIdx.x - 1)*blockDim.x + threadIdx.x;
         d_Nds[threadIdx.x - (blockDim.x - n)] = (halo_index_left < 0) ? 0 : d_N[halo_index_left];
     }
-
-    d_Nds[n + threadIdx.x] = d_N[i];
-    
-    if (threadIdx.x < n) {
+    else if (threadIdx.x < n) {
         int halo_index_right = (blockIdx.x + 1)*blockDim.x + threadIdx.x;
         d_Nds[n + blockDim.x + threadIdx.x] = (halo_index_right >= Width) ? 0 : d_N[halo_index_right];
     }
+    d_Nds[n + threadIdx.x] = d_N[i];
 
     __syncthreads();
 
